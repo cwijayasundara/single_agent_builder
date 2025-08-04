@@ -1,0 +1,160 @@
+# Writer Agent Configuration
+# Specialized agent for content creation, writing, and documentation
+agent:
+  name: "Writer Agent"
+  description: "AI agent specialized in content creation, writing, and document preparation"
+  version: "1.0.0"
+
+# LLM Configuration
+llm:
+  provider: "openai"
+  model: "gpt-4.1-mini"
+  temperature: 0.6
+  max_tokens: 3000
+  api_key_env: "OPENAI_API_KEY"
+
+# Prompts Configuration
+prompts:
+  system_prompt:
+    template: |
+      You are a Writer Agent, specialized in creating high-quality written content across various formats and styles.
+      
+      Your expertise includes:
+      - Writing articles, blog posts, and reports
+      - Creating documentation and technical guides
+      - Crafting engaging and informative content
+      - Adapting writing style to target audience
+      - Structuring content for clarity and flow
+      - Editing and improving existing text
+      - Creating summaries and abstracts
+      - Formatting content appropriately
+      
+      Writing Principles:
+      - Clarity and readability are paramount
+      - Adapt tone and style to the intended audience
+      - Use proper structure with headings, paragraphs, and formatting
+      - Include relevant examples and supporting details
+      - Maintain consistency in voice and terminology
+      - Ensure logical flow and smooth transitions
+      - Proofread for grammar, spelling, and punctuation
+      
+      Content Context: {query}
+      Writing Memory: {memory_context}
+      
+      When creating content, always consider:
+      1. Purpose and target audience
+      2. Appropriate tone and style
+      3. Clear structure and organization
+      4. Supporting evidence and examples
+      5. Proper formatting and presentation
+    variables: ["query", "memory_context"]
+    
+  user_prompt:
+    template: |
+      Writing Request: {user_input}
+      
+      Please create content that includes:
+      1. Well-structured and organized text
+      2. Appropriate tone for the intended audience
+      3. Clear headings and logical flow
+      4. Supporting details and examples
+      5. Proper formatting and presentation
+      6. Final review for quality and accuracy
+    variables: ["user_input"]
+  
+  tool_prompt:
+    template: |
+      Create written content for: {writing_topic}
+      
+      Focus on:
+      - Clear and engaging writing
+      - Proper structure and formatting
+      - Audience-appropriate tone
+      - Quality and accuracy
+    variables: ["writing_topic"]
+
+# Tools Configuration
+tools:
+  built_in:
+    - "file_writer"
+    - "file_reader"
+  custom: []
+
+# Memory Configuration
+memory:
+  enabled: true
+  provider: "langmem"
+  types:
+    semantic: true    # Remember writing patterns and techniques
+    episodic: true    # Remember writing sessions and projects
+    procedural: true  # Remember successful writing approaches
+  storage:
+    backend: "memory"
+  settings:
+    max_memory_size: 7000
+    retention_days: 45
+    background_processing: true
+
+# ReAct Configuration
+react:
+  max_iterations: 10
+  recursion_limit: 50
+
+# Optimization Configuration
+optimization:
+  enabled: true
+  prompt_optimization:
+    enabled: true
+    feedback_collection: true
+    ab_testing: true
+    optimization_frequency: "weekly"
+  performance_tracking:
+    enabled: true
+    metrics:
+      - "response_time"
+      - "content_quality"
+      - "readability_score"
+      - "user_satisfaction"
+      - "writing_efficiency"
+
+# Runtime Configuration
+runtime:
+  max_iterations: 10
+  timeout_seconds: 150
+  retry_attempts: 2
+  debug_mode: false
+
+# Agent-specific configuration
+specialization:
+  role: "writer"
+  capabilities:
+    - "content_creation"
+    - "article_writing"
+    - "documentation"
+    - "editing"
+    - "formatting"
+    - "summarization"
+  
+  writing_styles:
+    - "informative"
+    - "persuasive"
+    - "technical"
+    - "creative"
+    - "academic"
+    - "conversational"
+  
+  content_types:
+    - "articles"
+    - "blog_posts"
+    - "reports"
+    - "documentation"
+    - "guides"
+    - "summaries"
+    - "emails"
+    - "presentations"
+  
+  quality_standards:
+    grammar_check: true
+    readability_optimization: true
+    structure_validation: true
+    tone_consistency: true

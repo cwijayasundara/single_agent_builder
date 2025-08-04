@@ -1,0 +1,135 @@
+# Example research agent configuration with comprehensive logging
+agent:
+  name: "Research Agent with Logging"
+  description: "A research-focused agent with comprehensive logging configuration"
+  version: "2.0.0"
+
+# LLM Configuration
+llm:
+  provider: "openai"
+  model: "gpt-4.1-mini"
+  temperature: 0.3
+  max_tokens: 2000
+  api_key_env: "OPENAI_API_KEY"
+
+# Prompt Configuration
+prompts:
+  system_prompt: |
+    You are a research assistant specialized in gathering and analyzing information.
+    Your task is to provide comprehensive, well-researched responses.
+    
+    Available context variables: {query}, {memory_context}, {project_context}
+    
+    Always cite your sources and provide structured, actionable insights.
+
+# Tools Configuration
+tools:
+  built_in:
+    - "web_search"
+    - "calculator"
+    - "file_reader"
+  custom: []
+
+# Memory Configuration  
+memory:
+  enabled: true
+  types:
+    semantic: true
+    episodic: true
+    procedural: false
+  storage:
+    backend: "memory"
+    connection_string: ""
+  retention:
+    max_episodes: 100
+    max_age_days: 30
+
+# Evaluation Configuration
+evaluation:
+  enabled: true
+  auto_evaluate: true
+  evaluation_frequency: "per_run"
+  metrics:
+    - "correctness"
+    - "helpfulness"
+    - "response_time"
+  evaluators:
+    - name: "correctness"
+      type: "heuristic"
+      parameters:
+        threshold: 0.7
+    - name: "response_time"
+      type: "heuristic"
+      parameters:
+        target_time: 5.0
+        max_time: 20.0
+  langsmith:
+    enabled: false
+    project_name: "research-agent-evaluation"
+    api_key_env: "LANGSMITH_API_KEY"
+
+# ReAct Configuration
+react:
+  max_iterations: 5
+  recursion_limit: 15
+
+# Logging Configuration (NEW)
+logging:
+  enabled: true
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "structured"  # structured or json
+  
+  # Console logging
+  console:
+    enabled: true
+    level: "INFO"
+    format: "structured"
+  
+  # File logging
+  file:
+    enabled: true
+    path: "logs/research_agent.log" 
+    level: "DEBUG"
+    format: "json"
+    max_size_mb: 10
+    backup_count: 5
+  
+  # Component-specific logging levels
+  components:
+    agent: "INFO"
+    evaluation: "DEBUG"
+    memory: "INFO"
+    llm: "WARNING"
+    tools: "INFO"
+  
+  # Correlation and tracing
+  correlation:
+    enabled: true
+    include_in_response: false
+  
+  # Performance monitoring
+  performance:
+    log_execution_time: true
+    log_token_usage: true
+    log_memory_operations: true
+    log_tool_executions: true
+  
+  # Sensitive data filtering
+  privacy:
+    mask_api_keys: true
+    mask_user_input: false
+    mask_responses: false
+    excluded_fields: []
+  
+  # Custom formatters and handlers
+  custom:
+    structured_extra_fields:
+      - "agent_name"
+      - "execution_id"
+      - "correlation_id"
+      - "timestamp"
+    json_ensure_ascii: false
+    json_indent: null
+
+# Debug mode
+debug_mode: false

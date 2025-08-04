@@ -1,0 +1,109 @@
+# Coding Assistant Configuration
+agent:
+  name: "Coding Assistant"
+  description: "AI agent specialized in software development and programming tasks"
+  version: "1.0.0"
+
+# LLM Configuration
+llm:
+  provider: "anthropic"
+  model: "claude-3-5-sonnet-20241022"
+  temperature: 0.1
+  max_tokens: 4000
+  api_key_env: "ANTHROPIC_API_KEY"
+
+# Prompts Configuration
+prompts:
+  system_prompt:
+    template: |
+      You are an expert software developer and coding assistant. Your role is to help users with:
+      - Writing clean, efficient, and well-documented code
+      - Debugging and troubleshooting issues
+      - Code reviews and optimization suggestions
+      - Architecture and design decisions
+      - Best practices and conventions
+      
+      Programming context: {programming_language}
+      Project context: {project_context}
+      Memory context: {memory_context}
+      
+      Always:
+      - Write production-ready code
+      - Include proper error handling
+      - Add meaningful comments
+      - Follow language-specific best practices
+      - Consider security implications
+    variables: ["programming_language", "project_context", "memory_context"]
+    
+  user_prompt:
+    template: |
+      Coding Request: {user_input}
+      
+      Language: {language}
+      Current file: {current_file}
+      
+      Please provide:
+      1. Complete, working code solution
+      2. Explanation of the approach
+      3. Potential improvements or alternatives
+      4. Testing suggestions
+    variables: ["user_input", "language", "current_file"]
+  
+  tool_prompt:
+    template: |
+      Execute the following coding task: {task}
+      Language: {language}
+      
+      Ensure the code is tested and follows best practices.
+    variables: ["task", "language"]
+
+# Tools Configuration
+tools:
+  built_in:
+    - "file_reader"
+    - "file_writer"
+    - "code_executor"
+  custom: []
+
+# Memory Configuration
+memory:
+  enabled: true
+  provider: "langmem"
+  types:
+    semantic: true
+    episodic: true
+    procedural: true
+  storage:
+    backend: "memory"
+  settings:
+    max_memory_size: 8000
+    retention_days: 60
+    background_processing: true
+
+# ReAct Configuration (simplified - no complex graph needed)
+react:
+  max_iterations: 15
+  recursion_limit: 60
+
+# Optimization Configuration
+optimization:
+  enabled: true
+  prompt_optimization:
+    enabled: true
+    feedback_collection: true
+    ab_testing: false  # More conservative for code generation
+    optimization_frequency: "monthly"
+  performance_tracking:
+    enabled: true
+    metrics:
+      - "code_quality"
+      - "execution_success"
+      - "user_satisfaction"
+      - "response_time"
+
+# Runtime Configuration
+runtime:
+  max_iterations: 15
+  timeout_seconds: 180
+  retry_attempts: 3
+  debug_mode: true

@@ -1,0 +1,109 @@
+# Groq Agent Configuration
+agent:
+  name: "Groq Coding Assistant"
+  description: "AI agent powered by Groq's fast LLMs for coding tasks"
+  version: "1.0.0"
+
+# LLM Configuration
+llm:
+  provider: "groq"
+  model: "meta-llama/llama-4-scout-17b-16e-instruct"
+  temperature: 0.1
+  max_tokens: 4000
+  api_key_env: "GROQ_API_KEY"
+
+# Prompts Configuration
+prompts:
+  system_prompt:
+    template: |
+      You are an expert software developer and coding assistant powered by Groq's fast LLMs. Your role is to help users with:
+      - Writing clean, efficient, and well-documented code
+      - Debugging and troubleshooting issues
+      - Code reviews and optimization suggestions
+      - Architecture and design decisions
+      - Best practices and conventions
+      
+      Programming context: {programming_language}
+      Project context: {project_context}
+      Memory context: {memory_context}
+      
+      Always:
+      - Write production-ready code
+      - Include proper error handling
+      - Add meaningful comments
+      - Follow language-specific best practices
+      - Consider security implications
+    variables: ["programming_language", "project_context", "memory_context"]
+    
+  user_prompt:
+    template: |
+      Coding Request: {user_input}
+      
+      Language: {language}
+      Current file: {current_file}
+      
+      Please provide:
+      1. Complete, working code solution
+      2. Explanation of the approach
+      3. Potential improvements or alternatives
+      4. Testing suggestions
+    variables: ["user_input", "language", "current_file"]
+  
+  tool_prompt:
+    template: |
+      Execute the following coding task: {task}
+      Language: {language}
+      
+      Ensure the code is tested and follows best practices.
+    variables: ["task", "language"]
+
+# Tools Configuration
+tools:
+  built_in:
+    - "file_reader"
+    - "file_writer"
+    - "code_executor"
+    - "calculator"
+  custom: []
+
+# Memory Configuration
+memory:
+  enabled: true
+  provider: "langmem"
+  types:
+    semantic: true
+    episodic: true
+    procedural: true
+  storage:
+    backend: "memory"
+  settings:
+    max_memory_size: 3000
+    retention_days: 30
+    background_processing: true
+
+# ReAct Configuration
+react:
+  max_iterations: 8
+  recursion_limit: 30
+
+# Optimization Configuration
+optimization:
+  enabled: true
+  prompt_optimization:
+    enabled: true
+    feedback_collection: true
+    ab_testing: true
+    optimization_frequency: "weekly"
+  performance_tracking:
+    enabled: true
+    metrics:
+      - "response_time"
+      - "code_quality"
+      - "user_satisfaction"
+
+# Runtime Configuration
+runtime:
+  max_iterations: 8
+  timeout_seconds: 30
+  retry_attempts: 2
+  debug_mode: false 
