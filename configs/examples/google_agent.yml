@@ -1,0 +1,184 @@
+# Google Agent Configuration
+agent:
+  name: "Google Research Assistant"
+  description: "AI agent powered by Google's Gemini model for research tasks"
+  version: "1.0.0"
+
+# LLM Configuration
+llm:
+  provider: "google"
+  model: "gemini-1.5-flash"
+  temperature: 0.3
+  max_tokens: 2000
+  api_key_env: "GOOGLE_API_KEY"
+
+# Prompts Configuration
+prompts:
+  system_prompt:
+    template: |
+      You are a professional research assistant AI agent. Your primary role is to help users find, analyze, and synthesize information on various topics. You are an independent research assistant, not affiliated with any specific company or organization.
+      
+      IMPORTANT CLARIFICATIONS:
+      - You are a research assistant agent, regardless of which AI model powers you
+      - You do not represent or speak for any company (including OpenAI, Google, Anthropic, etc.)
+      - Your job is to help users research information, not to provide company-specific information about your underlying AI model
+      - When asked about AI model release dates, product announcements, or company plans, you should research publicly available information
+      
+      IMPORTANT TOOL USAGE INSTRUCTIONS:
+      - For current information (prices, news, recent events, market data), ALWAYS use the web_search tool FIRST
+      - When asked about cryptocurrency prices, stock prices, current events, or any time-sensitive data, immediately search the web
+      - Use web_search for any information that might have changed since your training data cutoff
+      - Examples of when to search: "Bitcoin price", "current news", "today's weather", "stock market", "recent developments"
+      
+      Guidelines:
+      - Provide accurate, well-sourced information
+      - Always cite sources when possible, especially from web search results
+      - Be thorough but concise
+      - Ask clarifying questions when the research request is ambiguous
+      - Present information in a structured, easy-to-read format
+      - When you find current information via web search, clearly indicate the search date and sources
+      
+      Current user query: {query}
+      Context from memory: {memory_context}
+    variables: ["query", "memory_context"]
+    
+  user_prompt:
+    template: |
+      Research Request: {user_input}
+      
+      Please provide a comprehensive research response that includes:
+      1. Key findings
+      2. Relevant sources (if applicable)
+      3. Analysis and insights
+      4. Recommendations for further research
+    variables: ["user_input"]
+  
+  tool_prompt:
+    template: |
+      TOOL USAGE REQUIRED: Use the web_search tool to gather current information for: {research_topic}
+      
+      MANDATORY: If the query involves current data (prices, news, recent events), you MUST search the web first.
+      Focus on finding credible, recent sources and always cite them in your response.
+      
+      Search Strategy:
+      - Start with web_search for any time-sensitive information
+      - Use specific search terms related to {research_topic}
+      - Look for recent, authoritative sources
+    variables: ["research_topic"]
+
+# Tools Configuration
+tools:
+  built_in:
+    - "web_search"
+    - "file_reader"
+    - "file_writer"
+  custom: []
+
+# Memory Configuration
+memory:
+  enabled: true
+  provider: "langmem"
+  types:
+    semantic: true
+    episodic: true
+    procedural: true
+  storage:
+    backend: "memory"
+  settings:
+    max_memory_size: 5000
+    retention_days: 30
+    background_processing: true
+
+# ReAct Configuration
+react:
+  max_iterations: 10
+  recursion_limit: 50
+
+# Optimization Configuration
+optimization:
+  enabled: true
+  prompt_optimization:
+    enabled: true
+    feedback_collection: true
+    ab_testing: true
+    optimization_frequency: "weekly"
+  performance_tracking:
+    enabled: true
+    metrics:
+      - "response_time"
+      - "accuracy"
+      - "user_satisfaction"
+
+# Runtime Configuration
+runtime:
+  max_iterations: 10
+  timeout_seconds: 60
+  retry_attempts: 3
+  debug_mode: false
+
+# Evaluation Configuration
+evaluation:
+  enabled: true
+  langsmith:
+    enabled: false  # Set to true if LangSmith is available
+    api_key_env: "LANGSMITH_API_KEY"
+    project_name: "google_research_agent"
+    endpoint: "https://api.smith.langchain.com"
+    tracing: false
+  evaluators:
+    - name: "research_quality"
+      type: "llm_as_judge"
+      prompt: |
+        Evaluate the research quality of this Gemini-powered agent response.
+        Consider:
+        1. Accuracy and factual correctness
+        2. Use of current information via web search
+        3. Source quality and citations
+        4. Completeness of research
+        5. Clarity of presentation
+        Score from 0.0 to 1.0 with detailed reasoning.
+      model: "openai:gpt-4.1-mini"  # Different model for unbiased evaluation
+      enabled: true
+    - name: "response_time"
+      type: "heuristic"
+      parameters:
+        target_time: 8.0
+        max_time: 45.0
+      enabled: true
+  metrics: ["research_quality", "response_time", "source_credibility"]
+  auto_evaluate: false
+  evaluation_frequency: "manual"
+  batch_size: 5
+  max_concurrency: 2
+
+# Logging Configuration
+logging:
+  enabled: true
+  level: "INFO"
+  format: "structured"
+  console:
+    enabled: true
+    level: "INFO"
+    format: "readable"
+  file:
+    enabled: false  # Enable if file logging needed
+    path: "logs/gemini_agent.log"
+    level: "DEBUG"
+    max_size_mb: 100
+    backup_count: 5
+  components:
+    agent: "INFO"
+    tools: "DEBUG"
+    memory: "INFO"
+    optimization: "INFO"
+  correlation:
+    enabled: true
+    include_in_response: false
+  performance:
+    log_execution_time: true
+    log_token_usage: true
+    log_memory_operations: false
+  privacy:
+    mask_api_keys: true
+    mask_user_input: false
+    excluded_fields: ["api_key", "auth_token"]

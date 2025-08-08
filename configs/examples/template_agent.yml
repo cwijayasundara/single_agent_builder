@@ -1,0 +1,340 @@
+# =============================================================================
+# AGENT CONFIGURATION TEMPLATE
+# =============================================================================
+# This is a comprehensive template for creating configurable AI agents.
+# Copy this file and customize it for your specific use case.
+# 
+# INSTRUCTIONS:
+# 1. Replace all placeholder values with your desired configurations
+# 2. Remove sections you don't need (most are optional)
+# 3. Uncomment and configure the sections you want to use
+# 4. Save with a descriptive name (e.g., my_custom_agent.yml)
+#
+# For minimal configuration, see minimal_agent.yml
+# =============================================================================
+
+# =============================================================================
+# AGENT INFORMATION (Required)
+# =============================================================================
+agent:
+  name: "My Custom Agent"                    # Replace with your agent's name
+  description: "Description of what this agent does"  # Describe your agent's purpose
+  version: "1.0.0"                          # Version for tracking changes
+
+# =============================================================================
+# LLM CONFIGURATION (Required)
+# =============================================================================
+llm:
+  # Provider options: "openai", "anthropic", "google", "groq"
+  provider: "openai"
+  
+  # Model options by provider:
+  # OpenAI: "gpt-4.1", "gpt-4.1-mini", "gpt-4o", "gpt-4o-mini"
+  # Anthropic: "claude-3-5-sonnet-20241022", "claude-3-5-haiku-20241022" 
+  # Google: "gemini-1.5-pro", "gemini-1.5-flash", "gemini-1.0-pro"
+  # Groq: "meta-llama/llama-4-scout-17b-16e-instruct", "llama-3.1-70b-versatile", "llama-3.1-8b-instant"
+  model: "gpt-4.1-mini"
+  
+  # Temperature: 0.0 (deterministic) to 2.0 (very creative)
+  temperature: 0.7
+  
+  # Maximum tokens in response (optional)
+  max_tokens: 2000
+  
+  # Environment variable containing your API key
+  api_key_env: "OPENAI_API_KEY"
+  
+  # Optional: Custom base URL for API endpoint
+  # base_url: "https://api.openai.com/v1"
+
+# =============================================================================
+# PROMPTS CONFIGURATION (Required)
+# =============================================================================
+prompts:
+  # System prompt - defines the agent's role and behavior
+  system_prompt:
+    template: |
+      You are a helpful AI assistant specialized in [YOUR DOMAIN/TASK].
+      
+      IMPORTANT TOOL USAGE INSTRUCTIONS:
+      - For current information (prices, news, recent events, market data), ALWAYS use the web_search tool FIRST
+      - When asked about cryptocurrency prices, stock prices, current events, or any time-sensitive data, immediately search the web
+      - Use web_search for any information that might have changed since your training data cutoff
+      - Examples of when to search: "Bitcoin price", "current news", "today's weather", "stock market", "recent developments"
+      
+      Your role is to:
+      - [Describe primary responsibility]
+      - [Describe secondary responsibility]  
+      - [Describe any specific behaviors]
+      
+      Guidelines:
+      - Be helpful and accurate
+      - Ask clarifying questions when needed
+      - Provide step-by-step explanations
+      - Always cite sources when possible, especially from web search results
+      - When you find current information via web search, clearly indicate the search date and sources
+      - [Add domain-specific guidelines]
+      
+      Current user query: {query}
+      Context from memory: {memory_context}
+      Additional context: {context}
+    variables: ["query", "memory_context", "context"]
+  
+  # Optional: User prompt template
+  user_prompt:
+    template: |
+      User Request: {user_input}
+      
+      Please provide a comprehensive response that addresses:
+      1. [What should be addressed]
+      2. [What else should be included]
+      3. [Any specific format requirements]
+    variables: ["user_input"]
+  
+  # Optional: Tool usage prompt
+  tool_prompt:
+    template: |
+      TOOL USAGE REQUIRED: Use the appropriate tools to help with: {task_description}
+      
+      MANDATORY: If the task involves current data (prices, news, recent events), you MUST use the web_search tool first.
+      Focus on [specific instructions for tool usage].
+      
+      Search Strategy:
+      - Use web_search for any time-sensitive information
+      - Use other tools as appropriate for the task
+      - Always cite sources from web search results
+    variables: ["task_description"]
+
+# =============================================================================
+# TOOLS CONFIGURATION (Optional)
+# =============================================================================
+tools:
+  # Built-in tools available:
+  # - "web_search": Search the web for information
+  # - "calculator": Perform mathematical calculations
+  # - "file_reader": Read files from the system
+  # - "file_writer": Write files to the system
+  # - "code_executor": Execute code snippets
+  built_in:
+    - "web_search"
+    # - "calculator"
+    # - "file_reader"
+    # - "file_writer"
+    # - "code_executor"
+  
+  # Custom tools (optional)
+  custom: []
+  # Example custom tool:
+  # - name: "my_custom_tool"
+  #   module_path: "my.custom.tools"
+  #   class_name: "MyTool"
+  #   description: "Description of what this tool does"
+  #   parameters:
+  #     param1: "value1"
+  #     param2: "value2"
+
+# =============================================================================
+# MEMORY CONFIGURATION (Optional but recommended)
+# =============================================================================
+memory:
+  enabled: true
+  provider: "langmem"
+  
+  # Types of memory to enable
+  types:
+    semantic: true      # Store facts and knowledge
+    episodic: true      # Store conversation history
+    procedural: true    # Store learned patterns and procedures
+  
+  # Storage backend
+  storage:
+    backend: "memory"   # Options: "memory", "postgres", "redis"
+    # connection_string: "postgresql://user:pass@localhost/db"  # For postgres
+  
+  # Memory settings
+  settings:
+    max_memory_size: 5000           # Maximum number of memory items
+    retention_days: 30              # How long to retain memories
+    background_processing: true     # Enable background memory processing
+
+# =============================================================================
+# REACT CONFIGURATION (Optional)
+# =============================================================================
+react:
+  max_iterations: 10    # Maximum reasoning-acting cycles
+  recursion_limit: 50   # Recursion limit for complex reasoning
+
+# =============================================================================
+# OPTIMIZATION CONFIGURATION (Optional)
+# =============================================================================
+optimization:
+  enabled: true
+  
+  # Prompt optimization settings
+  prompt_optimization:
+    enabled: true
+    feedback_collection: true
+    ab_testing: true
+    optimization_frequency: "weekly"
+  
+  # Performance tracking
+  performance_tracking:
+    enabled: true
+    metrics:
+      - "response_time"
+      - "accuracy"
+      - "user_satisfaction"
+      - "tool_usage_effectiveness"
+
+# =============================================================================
+# RUNTIME CONFIGURATION (Optional)
+# =============================================================================
+runtime:
+  max_iterations: 10        # Maximum iterations for complex tasks
+  timeout_seconds: 120      # Timeout for agent responses
+  retry_attempts: 2         # Number of retry attempts on failure
+  debug_mode: false         # Enable debug output
+
+# =============================================================================
+# EVALUATION CONFIGURATION (Optional but recommended for production)
+# =============================================================================
+evaluation:
+  enabled: true
+  
+  # LangSmith integration for tracing and evaluation
+  langsmith:
+    enabled: true
+    api_key_env: "LANGSMITH_API_KEY"
+    project_name: "my_agent_evaluation"
+    endpoint: "https://api.smith.langchain.com"
+    tracing: true
+  
+  # Evaluators to assess agent performance
+  evaluators:
+    - name: "correctness"
+      type: "llm_as_judge"
+      prompt: |
+        Evaluate if the agent's response is factually correct and helpful.
+        Consider:
+        1. Factual accuracy of information
+        2. Relevance to the user's request
+        3. Completeness of the response
+        4. Clarity and coherence
+        
+        Provide a score from 0.0 to 1.0 and detailed reasoning.
+      model: "openai:gpt-4.1-mini"
+      enabled: true
+    
+    - name: "helpfulness"
+      type: "llm_as_judge"
+      enabled: true
+    
+    - name: "response_time"
+      type: "heuristic"
+      parameters:
+        target_time: 8.0      # Target response time in seconds
+        max_time: 30.0        # Maximum acceptable response time
+      enabled: true
+    
+    - name: "tool_usage"
+      type: "heuristic"
+      enabled: true
+  
+  # Test datasets for evaluation
+  datasets:
+    - name: "quality_test"
+      description: "Test cases for agent quality evaluation"
+      examples:
+        - inputs:
+            query: "Example input query 1"
+          outputs:
+            answer: "Expected output for query 1"
+          metadata:
+            category: "example_category"
+        - inputs:
+            query: "Example input query 2"
+          outputs:
+            answer: "Expected output for query 2"
+          metadata:
+            category: "example_category"
+  
+  # Evaluation settings
+  metrics: ["correctness", "helpfulness", "response_time", "tool_usage"]
+  auto_evaluate: false              # Set to true for automatic evaluation
+  evaluation_frequency: "manual"    # "manual", "daily", "weekly"
+  batch_size: 5                     # Number of evaluations to run at once
+  max_concurrency: 2                # Maximum concurrent evaluations
+
+# =============================================================================
+# LOGGING CONFIGURATION (Optional)
+# =============================================================================
+logging:
+  enabled: true
+  level: "INFO"                     # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "structured"              # "structured" or "json"
+  
+  console:
+    enabled: true
+    level: "INFO"
+    format: "structured"
+  
+  file:
+    enabled: false
+    path: "logs/agent.log"
+    level: "INFO"
+    max_size_mb: 100
+    backup_count: 5
+  
+  components:
+    agent: "INFO"
+    evaluation: "INFO"
+    memory: "INFO"
+  
+  correlation:
+    enabled: true
+    include_in_response: false
+  
+  performance:
+    log_execution_time: true
+    log_token_usage: true
+    log_memory_operations: true
+  
+  privacy:
+    mask_api_keys: true
+    mask_user_input: false
+    excluded_fields: []
+
+# =============================================================================
+# CUSTOMIZATION NOTES
+# =============================================================================
+# 
+# COMMON CUSTOMIZATIONS:
+# 
+# 1. FOR RESEARCH AGENTS:
+#    - Add web_search to built_in tools
+#    - Use lower temperature (0.3) for factual accuracy
+#    - Include source citation in system prompt
+# 
+# 2. FOR CREATIVE AGENTS:
+#    - Use higher temperature (0.8-1.0)
+#    - Focus on creativity in system prompt
+#    - Remove factual accuracy evaluators
+# 
+# 3. FOR CODING AGENTS:
+#    - Add code_executor and file_reader to tools
+#    - Use very low temperature (0.1)
+#    - Include code review guidelines in system prompt
+# 
+# 4. FOR CUSTOMER SUPPORT:
+#    - Include escalation procedures in system prompt
+#    - Use moderate temperature (0.5)
+#    - Add response_time evaluator with low target
+# 
+# PROVIDER-SPECIFIC TIPS:
+# 
+# - OpenAI: Best for general purpose, good tool usage
+# - Anthropic: Excellent for analysis and reasoning
+# - Google Gemini: Fast and cost-effective
+# - Groq: Extremely fast inference, good for real-time apps
+# 
+# =============================================================================

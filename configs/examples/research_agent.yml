@@ -1,0 +1,216 @@
+# Research Agent Configuration
+agent:
+  name: "Research Assistant"
+  description: "AI agent specialized in research tasks and information gathering"
+  version: "1.0.0"
+
+# LLM Configuration
+llm:
+  provider: "openai"
+  model: "gpt-4.1-mini"
+  temperature: 0.3
+  max_tokens: 2000
+  api_key_env: "OPENAI_API_KEY"
+
+# Prompts Configuration
+prompts:
+  system_prompt:
+    template: |
+      You are a professional research assistant AI agent. Your primary role is to help users find, analyze, and synthesize information on various topics. You are an independent research assistant, not affiliated with any specific company or organization.
+      
+      IMPORTANT CLARIFICATIONS:
+      - You are a research assistant agent, regardless of which AI model powers you
+      - You do not represent or speak for any company (including OpenAI, Google, Anthropic, etc.)
+      - Your job is to help users research information, not to provide company-specific information about your underlying AI model
+      - When asked about AI model release dates, product announcements, or company plans, you should research publicly available information
+      
+      CRITICAL TOOL USAGE INSTRUCTIONS:
+      - For current information (prices, news, recent events, product releases, AI model updates), ALWAYS use the web_search tool FIRST
+      - When asked about GPT-5, Claude updates, Gemini releases, or any AI model information, immediately search the web for the latest announcements
+      - Use web_search for any information that might have changed since your training data cutoff
+      - Examples requiring web search: "GPT-5 release date", "latest AI models", "Bitcoin price", "current news", "recent product announcements"
+      
+      Research Guidelines:
+      - Always search the web for current information before responding
+      - Provide accurate, well-sourced information with citations
+      - Be thorough but concise in your research findings  
+      - Ask clarifying questions when the research request is ambiguous
+      - Present information in a structured, easy-to-read format
+      - When you find current information via web search, clearly indicate search date and sources
+      - If no current information is found, state that clearly and provide context about when information was last available
+      
+      Current user query: {query}
+      Context from memory: {memory_context}
+    variables: ["query", "memory_context"]
+    
+  user_prompt:
+    template: |
+      Research Request: {user_input}
+      
+      Please provide a comprehensive research response that includes:
+      1. Key findings
+      2. Relevant sources (if applicable)
+      3. Analysis and insights
+      4. Recommendations for further research
+    variables: ["user_input"]
+  
+  tool_prompt:
+    template: |
+      MANDATORY WEB SEARCH REQUIRED: You MUST use the web_search tool to gather current information for: {research_topic}
+      
+      CRITICAL: For queries about GPT-5, AI model releases, current events, prices, or any time-sensitive information, you MUST search the web BEFORE providing any response.
+      
+      Search Strategy:
+      - ALWAYS start with web_search for any information that could be current or recently updated
+      - Use specific, targeted search terms related to {research_topic}
+      - Search for official announcements, press releases, and authoritative sources
+      - Look for the most recent information available
+      - If initial search doesn't yield results, try alternative search terms
+      
+      After searching, provide your response with:
+      - Clear citations from web search results
+      - Dates when information was published
+      - Source credibility assessment
+      - If no current information found, explicitly state this
+    variables: ["research_topic"]
+
+# Tools Configuration
+tools:
+  built_in:
+    - "web_search"
+    - "file_reader"
+    - "file_writer"
+  custom: []
+
+# Memory Configuration
+memory:
+  enabled: true
+  provider: "langmem"
+  types:
+    semantic: true
+    episodic: true
+    procedural: true
+  storage:
+    backend: "memory"
+  settings:
+    max_memory_size: 5000
+    retention_days: 30
+    background_processing: true
+
+# ReAct Configuration (simplified - no complex graph needed)
+react:
+  max_iterations: 10
+  recursion_limit: 50
+
+# Optimization Configuration
+optimization:
+  enabled: true
+  prompt_optimization:
+    enabled: true
+    feedback_collection: true
+    ab_testing: true
+    optimization_frequency: "weekly"
+  performance_tracking:
+    enabled: true
+    metrics:
+      - "response_time"
+      - "accuracy"
+      - "user_satisfaction"
+      - "source_quality"
+
+# Runtime Configuration
+runtime:
+  max_iterations: 10
+  timeout_seconds: 120
+  retry_attempts: 2
+  debug_mode: false
+
+# Evaluation Configuration
+evaluation:
+  enabled: true
+  langsmith:
+    enabled: true
+    api_key_env: "LANGSMITH_API_KEY"
+    project_name: "research_agent_evaluation"
+    endpoint: "https://api.smith.langchain.com"
+    tracing: true
+  evaluators:
+    - name: "correctness"
+      type: "llm_as_judge"
+      prompt: |
+        Evaluate if the research response is factually correct and well-sourced.
+        Consider:
+        1. Factual accuracy of information
+        2. Quality and relevance of sources
+        3. Completeness of research findings
+        4. Logical consistency of conclusions
+        
+        Provide a score from 0.0 to 1.0 and detailed reasoning.
+      model: "openai:gpt-4.1-mini"
+      enabled: true
+    - name: "helpfulness"
+      type: "llm_as_judge"
+      enabled: true
+    - name: "response_time"
+      type: "heuristic"
+      parameters:
+        target_time: 8.0
+        max_time: 30.0
+      enabled: true
+    - name: "tool_usage"
+      type: "heuristic"
+      enabled: true
+  datasets:
+    - name: "research_quality_test"
+      description: "Test cases for research agent quality evaluation"
+      examples:
+        - inputs:
+            query: "What are the latest developments in artificial intelligence?"
+          outputs:
+            answer: "Recent AI developments include advances in large language models, multimodal AI, and AI safety research."
+          metadata:
+            category: "general_research"
+        - inputs:
+            query: "Find information about climate change impacts on agriculture"
+          outputs:
+            answer: "Climate change significantly affects agriculture through changing precipitation patterns, temperature increases, and extreme weather events."
+          metadata:
+            category: "specific_research"
+  metrics: ["correctness", "helpfulness", "response_time", "tool_usage", "source_quality"]
+  auto_evaluate: false
+  evaluation_frequency: "manual"
+  batch_size: 5
+  max_concurrency: 2
+
+# Logging Configuration
+logging:
+  enabled: true
+  level: "INFO"
+  format: "structured"
+  console:
+    enabled: true
+    level: "INFO"
+    format: "readable"
+  file:
+    enabled: false  # Enable if file logging needed
+    path: "logs/research_agent.log"
+    level: "DEBUG"
+    max_size_mb: 100
+    backup_count: 5
+  components:
+    agent: "INFO"
+    tools: "DEBUG"  # Detailed tool logging for research
+    memory: "INFO"
+    optimization: "INFO"
+    evaluation: "INFO"
+  correlation:
+    enabled: true
+    include_in_response: false
+  performance:
+    log_execution_time: true
+    log_token_usage: true
+    log_memory_operations: false
+  privacy:
+    mask_api_keys: true
+    mask_user_input: false
+    excluded_fields: ["api_key", "auth_token"]

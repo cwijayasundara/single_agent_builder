@@ -1,0 +1,175 @@
+# Customer Support Agent Configuration
+agent:
+  name: "Customer Support Agent"
+  description: "AI agent specialized in customer service and support tasks"
+  version: "1.0.0"
+
+# LLM Configuration
+llm:
+  provider: "openai"
+  model: "gpt-4.1-mini"
+  temperature: 0.7
+  max_tokens: 1500
+  api_key_env: "OPENAI_API_KEY"
+
+# Prompts Configuration
+prompts:
+  system_prompt:
+    template: |
+      You are a friendly and professional customer support agent. Your goal is to:
+      - Help customers resolve their issues quickly and effectively
+      - Provide accurate information about products and services
+      - Maintain a positive, empathetic tone
+      - Escalate complex issues when necessary
+      - Follow company policies and procedures
+      
+      Customer context: {customer_info}
+      Previous interactions: {memory_context}
+      Support knowledge base: {knowledge_base}
+      
+      Always:
+      - Be patient and understanding
+      - Ask clarifying questions when needed
+      - Provide step-by-step solutions
+      - Confirm customer satisfaction
+      - Document important details
+    variables: ["customer_info", "memory_context", "knowledge_base"]
+    
+  user_prompt:
+    template: |
+      Customer Issue: {user_input}
+      
+      Customer Details:
+      - Name: {customer_name}
+      - Account: {account_info}
+      - Issue Category: {issue_category}
+      
+      Please provide:
+      1. Acknowledgment of the issue
+      2. Troubleshooting steps or solution
+      3. Follow-up questions if needed
+      4. Next steps or escalation if required
+    variables: ["user_input", "customer_name", "account_info", "issue_category"]
+  
+  tool_prompt:
+    template: |
+      Look up information for customer support: {query}
+      Focus on finding relevant policies, procedures, or solutions.
+    variables: ["query"]
+
+# Tools Configuration
+tools:
+  built_in:
+    - "web_search"
+    - "file_reader"
+  custom: []
+
+# Memory Configuration
+memory:
+  enabled: true
+  provider: "langmem"
+  types:
+    semantic: true    # Store product information, policies
+    episodic: true    # Remember customer interactions
+    procedural: true  # Learn successful resolution patterns
+  storage:
+    backend: "memory"
+  settings:
+    max_memory_size: 3000
+    retention_days: 90  # Keep customer history longer
+    background_processing: true
+
+# ReAct Configuration (simplified - no complex graph needed)
+react:
+  max_iterations: 8
+  recursion_limit: 40
+
+# Optimization Configuration
+optimization:
+  enabled: true
+  prompt_optimization:
+    enabled: true
+    feedback_collection: true
+    ab_testing: true
+    optimization_frequency: "weekly"
+  performance_tracking:
+    enabled: true
+    metrics:
+      - "resolution_rate"
+      - "customer_satisfaction"
+      - "response_time"
+      - "escalation_rate"
+
+# Runtime Configuration
+runtime:
+  max_iterations: 8
+  timeout_seconds: 60
+  retry_attempts: 2
+  debug_mode: false
+
+# Evaluation Configuration
+evaluation:
+  enabled: true
+  langsmith:
+    enabled: false  # Set to true if LangSmith is available
+    api_key_env: "LANGSMITH_API_KEY"
+    project_name: "customer_support_agent"
+    endpoint: "https://api.smith.langchain.com"
+    tracing: false
+  evaluators:
+    - name: "customer_satisfaction"
+      type: "llm_as_judge"
+      prompt: |
+        Evaluate the customer support response quality.
+        Consider:
+        1. Helpfulness and problem resolution
+        2. Professional and empathetic tone
+        3. Clarity of instructions
+        4. Completeness of response
+        5. Appropriate escalation when needed
+        Score from 0.0 to 1.0 with detailed reasoning.
+      model: "openai:gpt-4.1-mini"
+      enabled: true
+    - name: "response_time"
+      type: "heuristic"
+      parameters:
+        target_time: 5.0
+        max_time: 30.0
+      enabled: true
+  metrics: ["customer_satisfaction", "response_time", "resolution_rate"]
+  auto_evaluate: false
+  evaluation_frequency: "manual"
+  batch_size: 5
+  max_concurrency: 2
+
+# Logging Configuration
+logging:
+  enabled: true
+  level: "INFO"
+  format: "structured"
+  console:
+    enabled: true
+    level: "INFO"
+    format: "readable"
+  file:
+    enabled: true
+    path: "logs/customer_support.log"
+    level: "INFO"
+    max_size_mb: 150
+    backup_count: 7
+  components:
+    agent: "INFO"
+    tools: "INFO"
+    memory: "DEBUG"
+    optimization: "INFO"
+  correlation:
+    enabled: true
+    include_in_response: true  # Helpful for customer support tracking
+  performance:
+    log_execution_time: true
+    log_token_usage: false  # Less critical for customer support
+    log_memory_operations: true
+  privacy:
+    mask_api_keys: true
+    mask_user_input: true  # Protect customer privacy
+    excluded_fields: ["api_key", "auth_token", "customer_name", "account_info"]

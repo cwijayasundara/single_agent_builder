@@ -1,0 +1,97 @@
+# Gemini Agent Configuration
+agent:
+  name: "Gemini Research Assistant"
+  description: "AI agent powered by Google's Gemini model for research tasks"
+  version: "1.0.0"
+
+# LLM Configuration
+llm:
+  provider: "gemini"
+  model: "gemini-2.5-flash-preview-05-20"
+  temperature: 0.3
+  max_tokens: 2000
+  api_key_env: "GOOGLE_API_KEY"
+
+# Prompts Configuration
+prompts:
+  system_prompt:
+    template: |
+      You are a professional research assistant powered by Google's Gemini model. Your role is to help users find, analyze, and synthesize information on various topics.
+      
+      Guidelines:
+      - Provide accurate, well-sourced information
+      - Always cite sources when possible
+      - Be thorough but concise
+      - Ask clarifying questions when the research request is ambiguous
+      - Present information in a structured, easy-to-read format
+      
+      Current user query: {query}
+      Context from memory: {memory_context}
+    variables: ["query", "memory_context"]
+    
+  user_prompt:
+    template: |
+      Research Request: {user_input}
+      
+      Please provide a comprehensive research response that includes:
+      1. Key findings
+      2. Relevant sources (if applicable)
+      3. Analysis and insights
+      4. Recommendations for further research
+    variables: ["user_input"]
+  
+  tool_prompt:
+    template: |
+      Use the available tools to gather information for: {research_topic}
+      Focus on finding credible, recent sources.
+    variables: ["research_topic"]
+
+# Tools Configuration
+tools:
+  built_in:
+    - "web_search"
+    - "file_reader"
+    - "file_writer"
+  custom: []
+
+# Memory Configuration
+memory:
+  enabled: true
+  provider: "langmem"
+  types:
+    semantic: true
+    episodic: true
+    procedural: true
+  storage:
+    backend: "memory"
+  settings:
+    max_memory_size: 5000
+    retention_days: 30
+    background_processing: true
+
+# ReAct Configuration
+react:
+  max_iterations: 10
+  recursion_limit: 50
+
+# Optimization Configuration
+optimization:
+  enabled: true
+  prompt_optimization:
+    enabled: true
+    feedback_collection: true
+    ab_testing: true
+    optimization_frequency: "weekly"
+  performance_tracking:
+    enabled: true
+    metrics:
+      - "response_time"
+      - "accuracy"
+      - "user_satisfaction"
+
+# Runtime Configuration
+runtime:
+  max_iterations: 10
+  timeout_seconds: 60
+  retry_attempts: 3
+  debug_mode: false 

@@ -1,0 +1,209 @@
+# Web Browser Agent Configuration
+# Specialized agent for web browsing, searching, and information gathering
+agent:
+  name: "Web Browser Agent"
+  description: "AI agent specialized in web browsing, search, and online information gathering"
+  version: "1.0.0"
+
+# LLM Configuration
+llm:
+  provider: "openai"
+  model: "gpt-4.1-mini"
+  temperature: 0.2
+  max_tokens: 2500
+  api_key_env: "OPENAI_API_KEY"
+
+# Prompts Configuration
+prompts:
+  system_prompt:
+    template: |
+      You are a Web Browser Agent, specialized in finding and gathering information from the internet.
+      
+      Your expertise includes:
+      - Conducting targeted web searches
+      - Finding credible and relevant sources
+      - Extracting key information from web content
+      - Verifying information accuracy
+      - Gathering supporting data and statistics
+      - Finding recent news and developments
+      - Locating specific websites, documents, or resources
+      
+      Best Practices:
+      - Use specific, targeted search queries
+      - Prioritize credible sources (academic, official, established media)
+      - Always note the source and date of information
+      - Look for multiple sources to verify important facts
+      - Focus on the most recent and relevant information
+      - Organize findings in a clear, structured format
+      
+      Current search context: {query}
+      Previous search history: {memory_context}
+      
+      When presenting results, always include:
+      1. Summary of key findings
+      2. Source URLs and publication dates
+      3. Relevance assessment
+      4. Recommendations for additional searches if needed
+    variables: ["query", "memory_context"]
+    
+  user_prompt:
+    template: |
+      Web Search Request: {user_input}
+      
+      Please conduct a thorough web search and provide:
+      1. Key information found
+      2. Credible sources with URLs
+      3. Publication dates where available
+      4. Summary of most relevant findings
+      5. Suggestions for follow-up searches
+    variables: ["user_input"]
+  
+  tool_prompt:
+    template: |
+      Search the web for information about: {search_topic}
+      
+      Focus on finding:
+      - Recent and relevant information
+      - Credible sources
+      - Comprehensive coverage of the topic
+      - Supporting data and evidence
+    variables: ["search_topic"]
+
+# Tools Configuration
+tools:
+  built_in:
+    - "web_search"
+    - "file_reader"
+    - "file_writer"
+  custom: []
+
+# Memory Configuration
+memory:
+  enabled: true
+  provider: "langmem"
+  types:
+    semantic: true    # Remember facts and information found
+    episodic: true    # Remember search sessions and contexts
+    procedural: true  # Remember successful search strategies
+  storage:
+    backend: "memory"
+  settings:
+    max_memory_size: 6000
+    retention_days: 30
+    background_processing: true
+
+# ReAct Configuration
+react:
+  max_iterations: 8
+  recursion_limit: 40
+
+# Optimization Configuration
+optimization:
+  enabled: true
+  prompt_optimization:
+    enabled: true
+    feedback_collection: true
+    ab_testing: true
+    optimization_frequency: "weekly"
+  performance_tracking:
+    enabled: true
+    metrics:
+      - "response_time"
+      - "search_accuracy"
+      - "source_quality"
+      - "information_relevance"
+      - "search_efficiency"
+
+# Runtime Configuration
+runtime:
+  max_iterations: 8
+  timeout_seconds: 100
+  retry_attempts: 2
+  debug_mode: false
+
+# Evaluation Configuration
+evaluation:
+  enabled: true
+  langsmith:
+    enabled: false  # Set to true if LangSmith is available
+    api_key_env: "LANGSMITH_API_KEY"
+    project_name: "web_browser_agent"
+    endpoint: "https://api.smith.langchain.com"
+    tracing: false
+  evaluators:
+    - name: "search_quality"
+      type: "llm_as_judge"
+      prompt: |
+        Evaluate the quality of the web search results and analysis.
+        Consider:
+        1. Relevance of sources found
+        2. Credibility of information sources
+        3. Completeness of search coverage
+        4. Accuracy of information extraction
+        Score from 0.0 to 1.0 with detailed reasoning.
+      model: "openai:gpt-4.1-mini"
+      enabled: true
+    - name: "response_time"
+      type: "heuristic"
+      parameters:
+        target_time: 10.0
+        max_time: 60.0
+      enabled: true
+  metrics: ["search_quality", "response_time", "source_credibility"]
+  auto_evaluate: false
+  evaluation_frequency: "manual"
+  batch_size: 5
+  max_concurrency: 2
+
+# Logging Configuration
+logging:
+  enabled: true
+  level: "INFO"
+  format: "structured"
+  console:
+    enabled: true
+    level: "INFO"
+    format: "readable"
+  file:
+    enabled: false  # Enable if file logging needed
+    path: "logs/web_browser_agent.log"
+    level: "DEBUG"
+    max_size_mb: 100
+    backup_count: 5
+  components:
+    agent: "INFO"
+    tools: "DEBUG"
+    memory: "INFO"
+    optimization: "INFO"
+  correlation:
+    enabled: true
+    include_in_response: false
+  performance:
+    log_execution_time: true
+    log_token_usage: true
+    log_memory_operations: false
+  privacy:
+    mask_api_keys: true
+    mask_user_input: false
+    excluded_fields: ["api_key", "auth_token"]
+
+# Agent-specific configuration
+specialization:
+  role: "web_browser"
+  capabilities:
+    - "web_search"
+    - "information_gathering"
+    - "source_verification"
+    - "fact_checking"
+    - "link_extraction"
+  
+  search_preferences:
+    max_results: 10
+    preferred_sources:
+      - "academic"
+      - "news"
+      - "official"
+      - "documentation"
+    
+    search_depth: "comprehensive"
+    time_preference: "recent"
